@@ -146,5 +146,5 @@ impl fmt::Display for Matrix {
 }
 
 #[cfg(test)]
-#[path = "algebra_tests.rs"]
+#[path = "../tests/algebra_tests.rs"]
 mod tests;
