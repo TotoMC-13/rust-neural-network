@@ -68,7 +68,64 @@ impl Matrix {
     }
 
     pub fn transpose(&self) -> Matrix {
-        todo!()
+        let mut res: Vec<f32> = vec![0.0; self.rows * self.cols];
+
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                let idx: usize = (j * self.rows) + i;
+                res[idx] = self.get(i, j);
+            }
+        }
+
+        Matrix {
+            items: res,
+            rows: self.cols,
+            cols: self.rows,
+        }
+    }
+
+    pub fn map(&self, func: fn(f32) -> f32) -> Matrix {
+        let items = &self.items;
+
+        let mut res: Vec<f32> = vec![0.0; items.len()];
+
+        for i in 0..items.len() {
+            res[i] = func(items[i]);
+        }
+
+        Matrix {
+            items: res,
+            rows: self.rows,
+            cols: self.cols,
+        }
+    }
+
+    pub fn random(rows: usize, cols: usize) -> Matrix {
+            let seed = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos() as u64;
+
+            Self::random_with_seed(rows, cols, seed)
+        }
+
+    pub fn random_with_seed(rows: usize, cols: usize, mut seed: u64) -> Matrix {
+        let mut res = vec![0.0; rows * cols];
+
+        for i in 0..res.len() {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+
+            let val = (seed as f32) / (u64::MAX as f32);
+            res[i] = (val * 2.0) - 1.0;
+        }
+
+        Matrix {
+            items: res,
+            rows,
+            cols,
+        }
     }
 }
 
@@ -87,3 +144,7 @@ impl fmt::Display for Matrix {
         Ok(())
     }
 }
+
+#[cfg(test)]
+#[path = "algebra_tests.rs"]
+mod tests;
