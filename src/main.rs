@@ -1,4 +1,4 @@
-use crate::math::algebra::Matrix;
+use crate::math::matrix::Matrix;
 
 mod math;
 

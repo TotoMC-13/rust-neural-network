@@ -35,8 +35,6 @@ fn test_sum_invalid_dimensions() {
 
 #[test]
 fn test_mul() {
-    // 1 2  x  5 6  =  (1*5 + 2*7) (1*6 + 2*8)  =  19 22
-    // 3 4     7 8     (3*5 + 4*7) (3*6 + 4*8)     43 50
     let m1 = Matrix::from(vec![1.0, 2.0, 3.0, 4.0], 2, 2);
     let m2 = Matrix::from(vec![5.0, 6.0, 7.0, 8.0], 2, 2);
     let prod = m1.mul(&m2);
