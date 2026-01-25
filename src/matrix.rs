@@ -67,6 +67,24 @@ impl Matrix {
         }
     }
 
+    pub fn dot_mul(&self, m: &Matrix) -> Matrix {
+        let msg = String::from("Invalid matrix dot multiplication, dimensions must be equal");
+        assert_eq!(self.rows, m.rows, "{}", &msg);
+        assert_eq!(self.cols, m.cols, "{}", &msg);
+
+        let mut res: Vec<f32> = vec![0.0; self.items.len()];
+
+        for i in 0..self.items.len() {
+            res[i] = self.items[i] * m.items[i];
+        }
+
+        Matrix {
+            items: res,
+            rows: self.rows,
+            cols: self.cols,
+        }
+    }
+
     pub fn transpose(&self) -> Matrix {
         let mut res: Vec<f32> = vec![0.0; self.rows * self.cols];
 

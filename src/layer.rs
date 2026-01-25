@@ -9,17 +9,6 @@ pub struct Layer {
 
 impl Layer {
     pub fn new(inputs: usize, neurons: usize, activation: fn(f32) -> f32, derivative: fn(f32) -> f32) -> Layer {
-        /*
-        Crear weights usando Matrix::random.
-
-        Recordatorio de dimensiones: Filas = inputs, Columnas = neurons.
-
-        Crear biases usando Matrix::random (o ceros si prefieres).
-
-        Recordatorio de dimensiones: Filas = 1, Columnas = neurons.
-
-        Retornar el struct con todo eso.
-        */
         Layer {
             weights: Matrix::random(inputs, neurons),
             biases: Matrix::random(1, neurons),

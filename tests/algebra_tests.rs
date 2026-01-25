@@ -146,3 +146,23 @@ fn test_map_square() {
     assert_eq!(mapped.get(1, 0), 16.0);
     assert_eq!(mapped.get(1, 1), 25.0);
 }
+
+#[test]
+fn test_dot_mul() {
+    let m1 = Matrix::from(vec![1.0, 2.0, 3.0, 4.0], 2, 2);
+    let m2 = Matrix::from(vec![2.0, 3.0, 4.0, 5.0], 2, 2);
+    let res = m1.dot_mul(&m2);
+
+    assert_eq!(res.get(0, 0), 2.0);
+    assert_eq!(res.get(0, 1), 6.0);
+    assert_eq!(res.get(1, 0), 12.0);
+    assert_eq!(res.get(1, 1), 20.0);
+}
+
+#[test]
+#[should_panic(expected = "Invalid matrix dot multiplication, dimensions must be equal")]
+fn test_dot_mul_invalid_dimensions() {
+    let m1 = Matrix::from(vec![1.0, 2.0], 1, 2);
+    let m2 = Matrix::from(vec![1.0, 2.0], 2, 1);
+    m1.dot_mul(&m2);
+}
