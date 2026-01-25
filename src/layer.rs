@@ -1,4 +1,4 @@
-use crate::math::matrix::Matrix;
+use crate::matrix::Matrix;
 
 pub struct Layer {
     weights: Matrix,

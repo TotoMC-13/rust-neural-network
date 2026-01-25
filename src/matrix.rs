@@ -1,8 +1,8 @@
 use std::fmt;
 
 pub struct Matrix {
-    rows: usize,
-    cols: usize,
+    pub rows: usize,
+    pub cols: usize,
     items: Vec<f32>,
 }
 

@@ -1,0 +1,147 @@
+use crate::matrix::Matrix;
+
+#[test]
+fn test_matrix_creation_and_get() {
+    let items = vec![1.0, 2.0, 3.0, 4.0];
+    let m = Matrix::from(items, 2, 2);
+    
+    assert_eq!(m.rows, 2);
+    assert_eq!(m.cols, 2);
+    assert_eq!(m.get(0, 0), 1.0);
+    assert_eq!(m.get(0, 1), 2.0);
+    assert_eq!(m.get(1, 0), 3.0);
+    assert_eq!(m.get(1, 1), 4.0);
+}
+
+#[test]
+fn test_matrix_single_element() {
+    let m = Matrix::from(vec![5.0], 1, 1);
+    assert_eq!(m.rows, 1);
+    assert_eq!(m.cols, 1);
+    assert_eq!(m.get(0, 0), 5.0);
+}
+
+#[test]
+fn test_matrix_row_vector() {
+    let m = Matrix::from(vec![1.0, 2.0, 3.0], 1, 3);
+    assert_eq!(m.rows, 1);
+    assert_eq!(m.cols, 3);
+    assert_eq!(m.get(0, 0), 1.0);
+    assert_eq!(m.get(0, 1), 2.0);
+    assert_eq!(m.get(0, 2), 3.0);
+}
+
+#[test]
+fn test_matrix_column_vector() {
+    let m = Matrix::from(vec![1.0, 2.0, 3.0], 3, 1);
+    assert_eq!(m.rows, 3);
+    assert_eq!(m.cols, 1);
+    assert_eq!(m.get(0, 0), 1.0);
+    assert_eq!(m.get(1, 0), 2.0);
+    assert_eq!(m.get(2, 0), 3.0);
+}
+
+#[test]
+fn test_sum() {
+    let m1 = Matrix::from(vec![1.0, 2.0, 3.0, 4.0], 2, 2);
+    let m2 = Matrix::from(vec![4.0, 3.0, 2.0, 1.0], 2, 2);
+    let sum = m1.sum(&m2);
+    
+    assert_eq!(sum.get(0, 0), 5.0);
+    assert_eq!(sum.get(0, 1), 5.0);
+    assert_eq!(sum.get(1, 0), 5.0);
+    assert_eq!(sum.get(1, 1), 5.0);
+}
+
+#[test]
+fn test_sum_with_negatives() {
+    let m1 = Matrix::from(vec![1.0, -2.0, 3.0, -4.0], 2, 2);
+    let m2 = Matrix::from(vec![-1.0, 2.0, -3.0, 4.0], 2, 2);
+    let sum = m1.sum(&m2);
+    
+    assert_eq!(sum.get(0, 0), 0.0);
+    assert_eq!(sum.get(0, 1), 0.0);
+    assert_eq!(sum.get(1, 0), 0.0);
+    assert_eq!(sum.get(1, 1), 0.0);
+}
+
+#[test]
+#[should_panic(expected = "Invalid matrix sum, dimensions must be equal")]
+fn test_sum_invalid_dimensions() {
+    let m1 = Matrix::from(vec![1.0, 2.0], 1, 2);
+    let m2 = Matrix::from(vec![1.0, 2.0], 2, 1);
+    m1.sum(&m2);
+}
+
+#[test]
+fn test_mul_non_square() {
+    let m1 = Matrix::from(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 2, 3);
+    let m2 = Matrix::from(vec![7.0, 8.0, 9.0, 10.0, 11.0, 12.0], 3, 2);
+    let prod = m1.mul(&m2);
+
+    assert_eq!(prod.rows, 2);
+    assert_eq!(prod.cols, 2);
+    assert_eq!(prod.get(0, 0), 58.0);
+    assert_eq!(prod.get(0, 1), 64.0);
+    assert_eq!(prod.get(1, 0), 139.0);
+    assert_eq!(prod.get(1, 1), 154.0);
+}
+
+#[test]
+fn test_mul_identity() {
+    let m = Matrix::from(vec![1.0, 2.0, 3.0, 4.0], 2, 2);
+    let identity = Matrix::from(vec![1.0, 0.0, 0.0, 1.0], 2, 2);
+    let prod = m.mul(&identity);
+
+    assert_eq!(prod.get(0, 0), 1.0);
+    assert_eq!(prod.get(0, 1), 2.0);
+    assert_eq!(prod.get(1, 0), 3.0);
+    assert_eq!(prod.get(1, 1), 4.0);
+}
+
+#[test]
+fn test_transpose_square() {
+    let m = Matrix::from(vec![1.0, 2.0, 3.0, 4.0], 2, 2);
+    let t = m.transpose();
+
+    assert_eq!(t.rows, 2);
+    assert_eq!(t.cols, 2);
+    assert_eq!(t.get(0, 0), 1.0);
+    assert_eq!(t.get(0, 1), 3.0);
+    assert_eq!(t.get(1, 0), 2.0);
+    assert_eq!(t.get(1, 1), 4.0);
+}
+
+#[test]
+fn test_transpose_row_to_column() {
+    let m = Matrix::from(vec![1.0, 2.0, 3.0], 1, 3);
+    let t = m.transpose();
+
+    assert_eq!(t.rows, 3);
+    assert_eq!(t.cols, 1);
+    assert_eq!(t.get(0, 0), 1.0);
+    assert_eq!(t.get(1, 0), 2.0);
+    assert_eq!(t.get(2, 0), 3.0);
+}
+
+#[test]
+fn test_map_with_addition() {
+    let m = Matrix::from(vec![1.0, 2.0, 3.0, 4.0], 2, 2);
+    let mapped = m.map(|x| x + 10.0);
+    
+    assert_eq!(mapped.get(0, 0), 11.0);
+    assert_eq!(mapped.get(0, 1), 12.0);
+    assert_eq!(mapped.get(1, 0), 13.0);
+    assert_eq!(mapped.get(1, 1), 14.0);
+}
+
+#[test]
+fn test_map_square() {
+    let m = Matrix::from(vec![2.0, 3.0, 4.0, 5.0], 2, 2);
+    let mapped = m.map(|x| x * x);
+    
+    assert_eq!(mapped.get(0, 0), 4.0);
+    assert_eq!(mapped.get(0, 1), 9.0);
+    assert_eq!(mapped.get(1, 0), 16.0);
+    assert_eq!(mapped.get(1, 1), 25.0);
+}

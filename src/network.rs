@@ -1,5 +1,5 @@
-use crate::math::matrix::Matrix;
-use crate::math::layer::Layer;
+use crate::matrix::Matrix;
+use crate::layer::Layer;
 
 pub struct Network {
     layers: Vec<Layer>,
