@@ -1,4 +1,5 @@
-use crate::matrix::Matrix;
+use neural_net::matrix::Matrix;
+
 
 #[test]
 fn test_matrix_creation_and_get() {
