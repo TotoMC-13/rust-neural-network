@@ -41,6 +41,24 @@ impl Matrix {
         }
     }
 
+    pub fn sub(&self, m: &Matrix) -> Matrix {
+        let msg = String::from("Invalid matrix sub, dimensions must be equal");
+        assert_eq!(self.rows, m.rows, "{}", &msg);
+        assert_eq!(self.cols, m.cols, "{}", &msg);
+
+        let mut res: Vec<f32> = vec![0.0; self.rows * self.cols];
+
+        for i in 0..self.items.len() {
+            res[i] = self.items[i] - m.items[i];
+        }
+
+        Matrix {
+            items: res,
+            rows: self.rows,
+            cols: self.cols,
+        }
+    }
+
     // Hacemos FILAS por COLUMNAS
     pub fn mul(&self, m: &Matrix) -> Matrix {
         assert_eq!(self.cols, m.rows, "Invalid matrix multiplication, m1 rows must be equal to m2 cols");
@@ -76,6 +94,20 @@ impl Matrix {
 
         for i in 0..self.items.len() {
             res[i] = self.items[i] * m.items[i];
+        }
+
+        Matrix {
+            items: res,
+            rows: self.rows,
+            cols: self.cols,
+        }
+    }
+
+    pub fn scalar_mul(&self, scalar: f32) -> Matrix {
+        let mut res: Vec<f32> = vec![0.0; self.items.len()];
+
+        for i in 0..self.items.len() {
+            res[i] = self.items[i] * scalar
         }
 
         Matrix {
@@ -162,5 +194,3 @@ impl fmt::Display for Matrix {
         Ok(())
     }
 }
-
-
