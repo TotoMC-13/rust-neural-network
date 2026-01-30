@@ -11,7 +11,16 @@ fn main() {
     let testing_data = load_data("testing-images.idx3-ubyte").unwrap();
     let testing_labels = load_labels("testing-labels.idx1-ubyte").unwrap();
 
-    // xor_demo();
+    let layers =  vec![
+        Layer::new(784, 64, sigmoid, sigmoid_prime),
+        Layer::new(64, 10, sigmoid, sigmoid_prime),
+    ];
+
+    let learning_rate = 0.5;
+
+    let mut net = Network::new(layers, learning_rate);
+
+    net.train(&training_data, &testing_data, 1000);
 }
 
 fn xor_demo() {

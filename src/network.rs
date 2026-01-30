@@ -67,6 +67,8 @@ impl Network {
         learning_rate: step size de n (para el gradient descent)
     */
     pub fn train(&mut self, inputs: &Vec<Matrix>, targets: &Vec<Matrix>, epochs: usize) {
+        println!("Entrenando...");
+        
         for _ in 0..epochs {
             for (i, input) in inputs.iter().cloned().enumerate() {
                 let outputs = self.feed_forward(input);
