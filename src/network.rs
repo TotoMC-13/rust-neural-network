@@ -1,5 +1,6 @@
 use crate::matrix::Matrix;
 use crate::layer::{Layer};
+use std::time::Instant;
 
 pub struct Network {
     layers: Vec<Layer>,
@@ -67,13 +68,25 @@ impl Network {
         learning_rate: step size de n (para el gradient descent)
     */
     pub fn train(&mut self, inputs: &Vec<Matrix>, targets: &Vec<Matrix>, epochs: usize) {
-        println!("Entrenando...");
+        let total_start = Instant::now();
         
-        for _ in 0..epochs {
+        println!("Iniciando entrenamiento con {} datos por {} epochs...", inputs.len(), epochs);
+        
+        for epoch in 0..epochs {
+            let epoch_start = Instant::now();
+            println!("--- Epoch {}/{} ---", epoch, epochs);
+
             for (i, input) in inputs.iter().cloned().enumerate() {
                 let outputs = self.feed_forward(input);
                 self.back_propagate(outputs, targets[i].clone());
+
+                if (i + 1) % 10_000 == 0 {
+                    let tiempo_parcial = epoch_start.elapsed();
+                    println!("   -> Procesadas {}/{} imágenes ({:.2?})", i + 1, inputs.len(), tiempo_parcial);
+                }
             }
+            println!("> Epoch {} finalizada en {:.2?}", epoch, epoch_start.elapsed());
         }
+        println!("*** Entrenamiento TOTAL finalizado en {:.2?} ***", total_start.elapsed());
     }
 }   

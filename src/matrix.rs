@@ -18,6 +18,10 @@ impl Matrix {
             cols,
         }
     }
+
+    pub fn get_items(&self) -> &Vec<f32> {
+        &self.items
+    }
     
     // Devuelve el elemento [i][j]
     pub fn get(&self, i: usize, j: usize) -> f32 {
@@ -150,6 +154,19 @@ impl Matrix {
             cols: self.cols,
         }
     }
+
+    pub fn argmax(&self) -> usize {
+            let mut max_index = 0;
+            let mut max_val = self.items[0];
+
+            for (i, &val) in self.items.iter().enumerate() {
+                if val > max_val {
+                    max_val = val;
+                    max_index = i;
+                }
+            }
+            max_index
+        }
 
     pub fn random(rows: usize, cols: usize) -> Matrix {
             let seed = std::time::SystemTime::now()

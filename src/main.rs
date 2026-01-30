@@ -5,7 +5,10 @@ use neural_net::activations::{sigmoid, sigmoid_prime};
 use neural_net::mnist::{load_data, load_labels};
 
 fn main() {
+    images_demo();
+}
 
+fn images_demo() {
     let training_data = load_data("train-images.idx3-ubyte").unwrap();
     let training_labels = load_labels("train-labels.idx1-ubyte").unwrap();
     let testing_data = load_data("testing-images.idx3-ubyte").unwrap();
@@ -20,7 +23,24 @@ fn main() {
 
     let mut net = Network::new(layers, learning_rate);
 
-    net.train(&training_data, &testing_data, 1000);
+    net.train(&training_data, &training_labels, 5);
+
+    println!("Evaluando");
+    let mut aciertos = 0;
+    let total = testing_data.len();
+
+    for (input, target) in testing_data.iter().zip(testing_labels.iter()) {
+        
+        let outputs = net.feed_forward(input.clone());
+        let prediction = outputs.last().unwrap();
+
+        if prediction.argmax() == target.argmax() {
+            aciertos += 1;
+        }
+    }
+
+    println!("Precision: {}/{} ({:.2}%)", 
+        aciertos, total, (aciertos as f32 / total as f32) * 100.0);
 }
 
 fn xor_demo() {
