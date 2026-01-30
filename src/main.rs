@@ -2,8 +2,19 @@ use neural_net::matrix::Matrix;
 use neural_net::network::Network;
 use neural_net::layer::Layer;
 use neural_net::activations::{sigmoid, sigmoid_prime};
+use neural_net::mnist::{load_data, load_labels};
 
 fn main() {
+
+    let training_data = load_data("train-images.idx3-ubyte").unwrap();
+    let training_labels = load_labels("train-labels.idx1-ubyte").unwrap();
+    let testing_data = load_data("testing-images.idx3-ubyte").unwrap();
+    let testing_labels = load_labels("testing-labels.idx1-ubyte").unwrap();
+
+    // xor_demo();
+}
+
+fn xor_demo() {
     // Datos de entrenamiento para resolver XOR
     // Dimensiones 1x2 (1 fila, 2 columnas)
     let inputs = vec![
@@ -34,17 +45,17 @@ fn main() {
     println!("Antes de Entrenar: ");
     for i in 0..inputs.len() {
         let output = network.feed_forward(inputs[i].clone());
-        println!("Input: {} -> Output: {:.4}", inputs[i], output.last().unwrap().get(0, 0));
+        println!("Input: {} -> Output: {:.3}", inputs[i], output.last().unwrap().get(0, 0));
     }
 
     // 4. Entrenar
     println!("\nEntrenando...");
-    network.train(&inputs, &targets, 200000);
+    network.train(&inputs, &targets, 20000);
 
     // 5. Probar despues de entrenar
     println!("\nDespués de Entrenar: ");
     for i in 0..inputs.len() {
         let output = network.feed_forward(inputs[i].clone());
-        println!("Input: {} -> Output: {:.4}", inputs[i], output.last().unwrap().get(0, 0));
+        println!("Input: {} -> Output: {:.3}", inputs[i], output.last().unwrap().get(0, 0));
     }
 }
