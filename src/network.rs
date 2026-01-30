@@ -82,7 +82,7 @@ impl Network {
 
                 if (i + 1) % 10_000 == 0 {
                     let tiempo_parcial = epoch_start.elapsed();
-                    println!("   -> Procesadas {}/{} imágenes ({:.2?})", i + 1, inputs.len(), tiempo_parcial);
+                    println!("   -> Procesadas {}/{} imagenes ({:.2?})", i + 1, inputs.len(), tiempo_parcial);
                 }
             }
             println!("> Epoch {} finalizada en {:.2?}", epoch, epoch_start.elapsed());
