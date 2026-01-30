@@ -87,6 +87,6 @@ impl Network {
             }
             println!("> Epoch {} finalizada en {:.2?}", epoch, epoch_start.elapsed());
         }
-        println!("*** Entrenamiento TOTAL finalizado en {:.2?} ***", total_start.elapsed());
+        println!("Entrenamiento TOTAL finalizado en {:.2?}", total_start.elapsed());
     }
 }   
