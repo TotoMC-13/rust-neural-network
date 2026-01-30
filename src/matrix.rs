@@ -1,5 +1,6 @@
 use std::fmt;
 
+#[derive(Clone)]
 pub struct Matrix {
     pub rows: usize,
     pub cols: usize,

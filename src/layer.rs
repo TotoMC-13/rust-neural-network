@@ -1,10 +1,10 @@
 use crate::matrix::Matrix;
 
 pub struct Layer {
-    weights: Matrix,
-    biases: Matrix,
-    activation: fn(f32) -> f32,
-    derivative: fn(f32) -> f32,
+    pub weights: Matrix,
+    pub biases: Matrix,
+    pub activation: fn(f32) -> f32,
+    pub derivative: fn(f32) -> f32,
 }
 
 impl Layer {
