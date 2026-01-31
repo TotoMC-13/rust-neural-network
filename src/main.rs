@@ -4,15 +4,22 @@ use neural_net::layer::Layer;
 use neural_net::activations::{sigmoid, sigmoid_prime};
 use neural_net::mnist::{load_data, load_labels};
 
+const DEMO: u8 = 1; // 0: xor demo, 1: images demo
+
 fn main() {
-    images_demo();
+
+    if DEMO == 1 {
+        images_demo();
+    } else if DEMO == 0 {
+        xor_demo();
+    }
 }
 
 fn images_demo() {
-    let training_data = load_data("train-images.idx3-ubyte").unwrap();
-    let training_labels = load_labels("train-labels.idx1-ubyte").unwrap();
-    let testing_data = load_data("testing-images.idx3-ubyte").unwrap();
-    let testing_labels = load_labels("testing-labels.idx1-ubyte").unwrap();
+    let training_data = load_data("data/train-images.idx3-ubyte").unwrap();
+    let training_labels = load_labels("data/train-labels.idx1-ubyte").unwrap();
+    let testing_data = load_data("data/testing-images.idx3-ubyte").unwrap();
+    let testing_labels = load_labels("data/testing-labels.idx1-ubyte").unwrap();
 
     let layers =  vec![
         Layer::new(784, 64, sigmoid, sigmoid_prime),
