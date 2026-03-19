@@ -86,7 +86,7 @@ fn xor_demo() {
 
     // 4. Entrenar
     println!("\nEntrenando...");
-    network.train(&inputs, &targets, 20000);
+    network.train(&inputs, &targets, 2000);
 
     // 5. Probar despues de entrenar
     println!("\nDespués de Entrenar: ");

@@ -1,5 +1,5 @@
+use crate::layer::Layer;
 use crate::matrix::Matrix;
-use crate::layer::{Layer};
 use std::time::Instant;
 
 pub struct Network {
@@ -9,7 +9,10 @@ pub struct Network {
 
 impl Network {
     pub fn new(layers: Vec<Layer>, learning_rate: f32) -> Network {
-        Network { layers, learning_rate}
+        Network {
+            layers,
+            learning_rate,
+        }
     }
 
     // Devuelve los input procesados, desde el primero al ultimo
@@ -20,18 +23,18 @@ impl Network {
 
         for i in 0..layers.len() {
             res.push(inputs);
-            inputs = layers[i].feed_forward(&res.last().unwrap()); 
+            inputs = layers[i].feed_forward(&res.last().unwrap());
         }
 
         // Agrego ultimo elemento (resultado)
         res.push(inputs);
-        
+
         res
     }
 
     /*
-        Calculamos el primer error, calculamos hacia donde debo moverme con el gradiente, 
-        calculo cuanto debo mover mis pesos y biases, calculo el error del que estaba 
+        Calculamos el primer error, calculamos hacia donde debo moverme con el gradiente,
+        calculo cuanto debo mover mis pesos y biases, calculo el error del que estaba
         antes que yo para pasarselo (con el gradiente sin LR), ahora si, me actualizo y
         despues cambio el error viejo para que lo use el que sigue.
     */
@@ -44,12 +47,15 @@ impl Network {
             let gradients = outputs[i + 1].map(layer.derivative).dot_mul(&error);
 
             // Calculamos los deltas de pesos (Aca si aplicamos LR)
-            let delta_weights = outputs[i].transpose().mul(&gradients).scalar_mul(self.learning_rate);
-            
+            let delta_weights = outputs[i]
+                .transpose()
+                .mul(&gradients)
+                .scalar_mul(self.learning_rate);
+
             // También necesitamos delta para bias (Gradients * LR)
             let delta_biases = gradients.scalar_mul(self.learning_rate);
 
-            // Calculamos el error para la siguiente vuelta (Usando gradiente PURO)
+            // Calculamos el error para la siguiente vuelta (Usando gradiente)
             let next_error = gradients.mul(&layer.weights.transpose());
 
             // Actualizamos la capa
@@ -59,7 +65,7 @@ impl Network {
             // Pasamos al siguiente
             error = next_error;
         }
-}
+    }
 
     /*
         inputs: datos de entrenamiento
@@ -69,9 +75,13 @@ impl Network {
     */
     pub fn train(&mut self, inputs: &Vec<Matrix>, targets: &Vec<Matrix>, epochs: usize) {
         let total_start = Instant::now();
-        
-        println!("Iniciando entrenamiento con {} datos por {} epochs...", inputs.len(), epochs);
-        
+
+        println!(
+            "Iniciando entrenamiento con {} datos por {} epochs...",
+            inputs.len(),
+            epochs
+        );
+
         for epoch in 0..epochs {
             let epoch_start = Instant::now();
             println!("--- Epoch {}/{} ---", epoch, epochs);
@@ -82,11 +92,23 @@ impl Network {
 
                 if (i + 1) % 10_000 == 0 {
                     let tiempo_parcial = epoch_start.elapsed();
-                    println!("   -> Procesadas {}/{} imagenes ({:.2?})", i + 1, inputs.len(), tiempo_parcial);
+                    println!(
+                        "   -> Procesadas {}/{} imagenes ({:.2?})",
+                        i + 1,
+                        inputs.len(),
+                        tiempo_parcial
+                    );
                 }
             }
-            println!("> Epoch {} finalizada en {:.2?}", epoch, epoch_start.elapsed());
+            println!(
+                "> Epoch {} finalizada en {:.2?}",
+                epoch,
+                epoch_start.elapsed()
+            );
         }
-        println!("Entrenamiento total finalizado en {:.2?}", total_start.elapsed());
+        println!(
+            "Entrenamiento total finalizado en {:.2?}",
+            total_start.elapsed()
+        );
     }
-}   
+}

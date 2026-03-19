@@ -1,4 +1,7 @@
 use std::fmt;
+use std::sync::atomic::{AtomicU64, Ordering};
+
+static SEED_COUNTER: AtomicU64 = AtomicU64::new(1);
 
 #[derive(Clone)]
 pub struct Matrix {
@@ -12,17 +15,13 @@ impl Matrix {
     pub fn from(items: Vec<f32>, rows: usize, cols: usize) -> Matrix {
         assert_eq!(items.len(), rows * cols, "Invalid dimensions");
 
-        Matrix {
-            items,
-            rows,
-            cols,
-        }
+        Matrix { items, rows, cols }
     }
 
     pub fn get_items(&self) -> &Vec<f32> {
         &self.items
     }
-    
+
     // Devuelve el elemento [i][j]
     pub fn get(&self, i: usize, j: usize) -> f32 {
         self.items[(i * self.cols) + j]
@@ -66,20 +65,23 @@ impl Matrix {
 
     // Hacemos FILAS por COLUMNAS
     pub fn mul(&self, m: &Matrix) -> Matrix {
-        assert_eq!(self.cols, m.rows, "Invalid matrix multiplication, m1 rows must be equal to m2 cols");
+        assert_eq!(
+            self.cols, m.rows,
+            "Invalid matrix multiplication, m1 rows must be equal to m2 cols"
+        );
 
         let mut res: Vec<f32> = vec![0.0; self.rows * m.cols];
 
         for i in 0..self.rows {
-            for j in 0..m.cols {
-                let mut sum: f32 = 0.0;
+            for k in 0..self.cols {
+                // Obtenemos el valor de la matriz A una sola vez por fila
+                let a_ik = self.get(i, k);
 
-                for k in 0..self.cols {
-                    sum += self.get(i, k) * m.get(k, j);
+                for j in 0..m.cols {
+                    let idx = (i * m.cols) + j;
+                    // Multiplicamos de forma lineal sobre B y sumamos al resultado
+                    res[idx] += a_ik * m.get(k, j);
                 }
-
-                let idx: usize = (i * m.cols) + j;
-                res[idx] = sum;
             }
         }
 
@@ -156,26 +158,31 @@ impl Matrix {
     }
 
     pub fn argmax(&self) -> usize {
-            let mut max_index = 0;
-            let mut max_val = self.items[0];
+        let mut max_index = 0;
+        let mut max_val = self.items[0];
 
-            for (i, &val) in self.items.iter().enumerate() {
-                if val > max_val {
-                    max_val = val;
-                    max_index = i;
-                }
+        for (i, &val) in self.items.iter().enumerate() {
+            if val > max_val {
+                max_val = val;
+                max_index = i;
             }
-            max_index
         }
+        max_index
+    }
 
     pub fn random(rows: usize, cols: usize) -> Matrix {
-            let seed = std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos() as u64;
+        let seed = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos() as u64;
 
-            Self::random_with_seed(rows, cols, seed)
-        }
+        // Le sumamos 1 al contador
+        let count = SEED_COUNTER.fetch_add(1, Ordering::SeqCst);
+
+        let unique_seed = seed.wrapping_add(count * 1_000_000);
+
+        Self::random_with_seed(rows, cols, unique_seed)
+    }
 
     pub fn random_with_seed(rows: usize, cols: usize, mut seed: u64) -> Matrix {
         let mut res = vec![0.0; rows * cols];
