@@ -82,7 +82,7 @@ impl Network {
         inputs: datos de entrenamiento
         targets: output deseado, es decir, objetivos
         epoch: epoca, cuantas "vueltas" le vamos a dar al set de datos
-        learning_rate: step size de n (para el gradient descent)
+        learning_rate: step size de n (para el gradient descent, es decir, el "tamaño del paso")
     */
     pub fn train(&mut self, inputs: &Vec<Matrix>, targets: &Vec<Matrix>, epochs: usize) {
         let total_start = Instant::now();
