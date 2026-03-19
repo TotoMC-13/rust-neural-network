@@ -8,10 +8,21 @@ pub struct Network {
 }
 
 impl Network {
+    pub fn layers(&self) -> &[Layer] {
+        &self.layers
+    }
+
     pub fn new(layers: Vec<Layer>, learning_rate: f32) -> Network {
         Network {
             layers,
             learning_rate,
+        }
+    }
+
+    pub fn from(layers: Vec<Layer>) -> Self {
+        Self {
+            layers,
+            learning_rate: 0.5, // Valor por defecto
         }
     }
 

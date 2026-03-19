@@ -11,15 +11,23 @@ pub struct Matrix {
 }
 
 impl Matrix {
+    pub fn rows(&self) -> usize {
+        self.rows
+    }
+
+    pub fn cols(&self) -> usize {
+        self.cols
+    }
+
+    pub fn items(&self) -> &Vec<f32> {
+        &self.items
+    }
+
     // Constructor
     pub fn from(items: Vec<f32>, rows: usize, cols: usize) -> Matrix {
         assert_eq!(items.len(), rows * cols, "Invalid dimensions");
 
         Matrix { items, rows, cols }
-    }
-
-    pub fn get_items(&self) -> &Vec<f32> {
-        &self.items
     }
 
     // Devuelve el elemento [i][j]

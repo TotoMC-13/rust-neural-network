@@ -1,4 +1,11 @@
-use crate::matrix::Matrix;
+use crate::activations::{sigmoid, sigmoid_prime};
+use crate::matrix::Matrix; // Importamos las tuyas
+
+#[derive(Clone, Copy)]
+pub enum Activation {
+    Sigmoid,
+    // Puedes agregar ReLU o Tanh aquí después
+}
 
 pub struct Layer {
     pub weights: Matrix,
@@ -8,20 +15,42 @@ pub struct Layer {
 }
 
 impl Layer {
-    pub fn new(inputs: usize, neurons: usize, activation: fn(f32) -> f32, derivative: fn(f32) -> f32) -> Layer {
+    pub fn weights(&self) -> &Matrix {
+        &self.weights
+    }
+    pub fn biases(&self) -> &Matrix {
+        &self.biases
+    }
+
+    // Constructor para entrenamiento (nuevo)
+    pub fn new(inputs: usize, neurons: usize, activation_type: Activation) -> Layer {
+        let (act, der) = match activation_type {
+            Activation::Sigmoid => (sigmoid, sigmoid_prime),
+        };
         Layer {
             weights: Matrix::random(inputs, neurons),
             biases: Matrix::random(1, neurons),
-            activation,
-            derivative,
+            activation: act,
+            derivative: der,
         }
     }
 
-    /*  
-        Hace σ(a * W + b), se hace de esta forma porque nuestros vectores estan "acostados"
-        por como diseñe las matrices
-    */
+    // Constructor para carga desde archivo
+    pub fn from(weights: Matrix, biases: Matrix, activation_type: Activation) -> Self {
+        let (act, der) = match activation_type {
+            Activation::Sigmoid => (sigmoid, sigmoid_prime),
+        };
+        Self {
+            weights,
+            biases,
+            activation: act,
+            derivative: der,
+        }
+    }
+
     pub fn feed_forward(&self, inputs: &Matrix) -> Matrix {
-        (inputs.mul(&self.weights)).sum(&self.biases).map(self.activation)
+        (inputs.mul(&self.weights))
+            .sum(&self.biases)
+            .map(self.activation)
     }
 }
