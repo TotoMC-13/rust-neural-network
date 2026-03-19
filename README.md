@@ -16,8 +16,8 @@ evitando el uso de librerías externas para el álgebra lineal, los algoritmos d
 
 ## Uso
 ```
-git clone <tu-enlace-del-repo>
-cd <nombre-de-tu-repo>
+git clone https://github.com/TotoMC-13/rust-neural-network.git
+cd rust-neural-network
 cargo run --release
 ```
 
