@@ -1,9 +1,10 @@
-use crate::activations::{sigmoid, sigmoid_prime};
+use crate::activations::{relu, relu_prime, sigmoid, sigmoid_prime};
 use crate::matrix::Matrix;
 
 #[derive(Clone, Copy)]
 pub enum Activation {
     Sigmoid,
+    Relu,
 }
 
 pub struct Layer {
@@ -23,8 +24,9 @@ impl Layer {
 
     // Constructor para entrenamiento
     pub fn new(inputs: usize, neurons: usize, activation_type: Activation) -> Layer {
-        let (act, der) = match activation_type {
+        let (act, der): (fn(f32) -> f32, fn(f32) -> f32) = match activation_type {
             Activation::Sigmoid => (sigmoid, sigmoid_prime),
+            Activation::Relu => (relu, relu_prime),
         };
         Layer {
             weights: Matrix::random(inputs, neurons),
@@ -36,8 +38,9 @@ impl Layer {
 
     // Constructor para carga desde archivo
     pub fn from(weights: Matrix, biases: Matrix, activation_type: Activation) -> Self {
-        let (act, der) = match activation_type {
+        let (act, der): (fn(f32) -> f32, fn(f32) -> f32) = match activation_type {
             Activation::Sigmoid => (sigmoid, sigmoid_prime),
+            Activation::Relu => (relu, relu_prime),
         };
         Self {
             weights,

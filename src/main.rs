@@ -2,20 +2,35 @@ use neural_net::layer::{Activation, Layer};
 use neural_net::matrix::Matrix;
 use neural_net::mnist::{load_data, load_labels};
 use neural_net::network::Network;
-
-const DEMO: u8 = 2;
+use std::io::{self, Write};
 
 fn main() {
-    if DEMO == 2 {
-        images_demo(true);
-    } else if DEMO == 1 {
-        images_demo(false);
-    } else if DEMO == 0 {
-        xor_demo();
+    let demo = pedir_entrada("Seleccione Demo (0: XOR, 1: MNIST Train, 2: MNIST Load): ");
+    let act_choice = pedir_entrada("Seleccione Activación (0: Sigmoid, 1: Relu): ");
+
+    let (activation, lr) = match act_choice {
+        1 => (Activation::Relu, 0.01),
+        _ => (Activation::Sigmoid, 0.5),
+    };
+
+    
+    match demo {
+        0 => xor_demo(activation),
+        1 => images_demo(false, activation, lr),
+        2 => images_demo(true, activation, lr),
+        _ => println!("Opción no válida"),
     }
 }
 
-fn images_demo(load: bool) {
+fn pedir_entrada(mensaje: &str) -> u8 {
+    print!("{}", mensaje);
+    io::stdout().flush().unwrap();
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).unwrap();
+    input.trim().parse().unwrap_or(0)
+}
+
+fn images_demo(load: bool, activation: Activation, lr: f32) {
     let training_data = load_data("data/train-images.idx3-ubyte").unwrap();
     let training_labels = load_labels("data/train-labels.idx1-ubyte").unwrap();
     let testing_data = load_data("data/testing-images.idx3-ubyte").unwrap();
@@ -25,10 +40,10 @@ fn images_demo(load: bool) {
         neural_net::io::load_network("images_model.nn").expect("Error al cargar")
     } else {
         let layers = vec![
-            Layer::new(784, 64, Activation::Sigmoid),
+            Layer::new(784, 64, activation),
             Layer::new(64, 10, Activation::Sigmoid),
         ];
-        let mut n = Network::new(layers, 0.5);
+        let mut n = Network::new(layers, lr);
         n.train(&training_data, &training_labels, 5);
         n
     };
@@ -58,7 +73,7 @@ fn images_demo(load: bool) {
     }
 }
 
-fn xor_demo() {
+fn xor_demo(activation: Activation) {
     let inputs = vec![
         Matrix::from(vec![0.0, 0.0], 1, 2),
         Matrix::from(vec![0.0, 1.0], 1, 2),
@@ -73,10 +88,7 @@ fn xor_demo() {
         Matrix::from(vec![0.0], 1, 1),
     ];
 
-    let layers = vec![
-        Layer::new(2, 3, Activation::Sigmoid),
-        Layer::new(3, 1, Activation::Sigmoid),
-    ];
+    let layers = vec![Layer::new(2, 3, activation), Layer::new(3, 1, activation)];
 
     let mut network = Network::new(layers, 0.5);
 

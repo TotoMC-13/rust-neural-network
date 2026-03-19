@@ -6,3 +6,11 @@ pub fn sigmoid(x: f32) -> f32 {
 pub fn sigmoid_prime(y: f32) -> f32 {
     y * (1.0 - y)
 }
+
+pub fn relu(x: f32) -> f32 {
+    if x > 0.0 { x } else { 0.0 }
+}
+
+pub fn relu_prime(x: f32) -> f32 {
+    if x > 0.0 { 1.0 } else { 0.0 }
+}

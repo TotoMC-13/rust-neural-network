@@ -1,0 +1,50 @@
+    Checking neural_net v0.1.0 (C:\Users\Tomas\Documents\rust-neural-network)
+error[E0425]: cannot find value `x` in this scope
+  --> src\activations.rs:15:8
+   |
+15 |     if x > 0.0 { 1.0 } else { 0.0 }
+   |        ^
+   |
+help: a local variable with a similar name exists
+   |
+15 -     if x > 0.0 { 1.0 } else { 0.0 }
+15 +     if y > 0.0 { 1.0 } else { 0.0 }
+   |
+
+error[E0308]: `match` arms have incompatible types
+  --> src\layer.rs:29:33
+   |
+27 |           let (act, der) = match activation_type {
+   |  __________________________-
+28 | |             Activation::Sigmoid => (sigmoid, sigmoid_prime),
+   | |                                    ------------------------ this is found to be of type `(fn(f32) -> f32 {sigmoid}, fn(f32) -> f32 {sigmoid_prime})`
+29 | |             Activation::Relu => (relu, relu_prime),
+   | |                                 ^^^^^^^^^^^^^^^^^^ expected `(fn(f32) -> f32 {sigmoid}, ...)`, found `(fn(f32) -> f32 {relu}, ...)`
+30 | |         };
+   | |_________- `match` arms have incompatible types
+   |
+   = note: expected tuple `(fn(_) -> _ {sigmoid}, fn(_) -> _ {sigmoid_prime})`
+              found tuple `(fn(_) -> _ {relu}, fn(_) -> _ {relu_prime})`
+   = note: different fn items have unique types, even if their signatures are the same
+   = help: consider casting both fn items to fn pointers using `as fn(f32) -> f32`
+
+error[E0308]: `match` arms have incompatible types
+  --> src\layer.rs:43:33
+   |
+41 |           let (act, der) = match activation_type {
+   |  __________________________-
+42 | |             Activation::Sigmoid => (sigmoid, sigmoid_prime),
+   | |                                    ------------------------ this is found to be of type `(fn(f32) -> f32 {sigmoid}, fn(f32) -> f32 {sigmoid_prime})`
+43 | |             Activation::Relu => (relu, relu_prime),
+   | |                                 ^^^^^^^^^^^^^^^^^^ expected `(fn(f32) -> f32 {sigmoid}, ...)`, found `(fn(f32) -> f32 {relu}, ...)`
+44 | |         };
+   | |_________- `match` arms have incompatible types
+   |
+   = note: expected tuple `(fn(_) -> _ {sigmoid}, fn(_) -> _ {sigmoid_prime})`
+              found tuple `(fn(_) -> _ {relu}, fn(_) -> _ {relu_prime})`
+   = note: different fn items have unique types, even if their signatures are the same
+   = help: consider casting both fn items to fn pointers using `as fn(f32) -> f32`
+
+Some errors have detailed explanations: E0308, E0425.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `neural_net` (lib) due to 3 previous errors
