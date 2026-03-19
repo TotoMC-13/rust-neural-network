@@ -1,10 +1,9 @@
 use crate::activations::{sigmoid, sigmoid_prime};
-use crate::matrix::Matrix; // Importamos las tuyas
+use crate::matrix::Matrix;
 
 #[derive(Clone, Copy)]
 pub enum Activation {
     Sigmoid,
-    // Puedes agregar ReLU o Tanh aquí después
 }
 
 pub struct Layer {
@@ -22,7 +21,7 @@ impl Layer {
         &self.biases
     }
 
-    // Constructor para entrenamiento (nuevo)
+    // Constructor para entrenamiento
     pub fn new(inputs: usize, neurons: usize, activation_type: Activation) -> Layer {
         let (act, der) = match activation_type {
             Activation::Sigmoid => (sigmoid, sigmoid_prime),
