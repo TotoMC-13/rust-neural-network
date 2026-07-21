@@ -84,7 +84,7 @@ impl Network {
         epoch: epoca, cuantas "vueltas" le vamos a dar al set de datos
         learning_rate: step size de n (para el gradient descent, es decir, el "tamaño del paso")
     */
-    pub fn train(&mut self, inputs: &Vec<Matrix>, targets: &Vec<Matrix>, epochs: usize) {
+    pub fn train(&mut self, inputs: &Vec<Matrix>, targets: &Vec<Matrix>, epochs: usize, silence_training: bool) {
         let total_start = Instant::now();
 
         println!(
@@ -95,7 +95,10 @@ impl Network {
 
         for epoch in 0..epochs {
             let epoch_start = Instant::now();
-            println!("--- Epoch {}/{} ---", epoch, epochs);
+
+            if !silence_training  {
+                println!("--- Epoch {}/{} ---", epoch, epochs);
+            }
 
             for (i, input) in inputs.iter().cloned().enumerate() {
                 let outputs = self.feed_forward(input);
@@ -111,11 +114,14 @@ impl Network {
                     );
                 }
             }
-            println!(
-                "> Epoch {} finalizada en {:.2?}",
-                epoch,
-                epoch_start.elapsed()
-            );
+
+            if !silence_training  {
+                println!(
+                    "> Epoch {} finalizada en {:.2?}",
+                    epoch,
+                    epoch_start.elapsed()
+                );
+            }
         }
         println!(
             "Entrenamiento total finalizado en {:.2?}",

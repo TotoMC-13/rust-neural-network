@@ -3,17 +3,29 @@ use neural_net::matrix::Matrix;
 use neural_net::mnist::{load_data, load_labels};
 use neural_net::network::Network;
 use std::io::{self, Write};
+use std::env; // <-- Agregá esto para leer los argumentos
 
 fn main() {
-    let demo = pedir_entrada("Seleccione Demo (0: XOR, 1: MNIST Train, 2: MNIST Load): ");
-    let act_choice = pedir_entrada("Seleccione Activación (0: Sigmoid, 1: Relu): ");
+    let args: Vec<String> = env::args().collect();
+    eprintln!("args recibidos: {:?}", args);
+
+    let demo = if args.len() > 1 {
+        args[1].parse().unwrap_or(0)
+    } else {
+        pedir_entrada("Seleccione Demo (0: XOR, 1: MNIST Train, 2: MNIST Load): ")
+    };
+
+    let act_choice = if args.len() > 2 {
+        args[2].parse().unwrap_or(0)
+    } else {
+        pedir_entrada("Seleccione Activación (0: Sigmoid, 1: Relu): ")
+    };
 
     let (activation, lr) = match act_choice {
         1 => (Activation::Relu, 0.01),
         _ => (Activation::Sigmoid, 0.5),
     };
 
-    
     match demo {
         0 => xor_demo(activation),
         1 => images_demo(false, activation, lr),
@@ -44,7 +56,7 @@ fn images_demo(load: bool, activation: Activation, lr: f32) {
             Layer::new(64, 10, Activation::Sigmoid),
         ];
         let mut n = Network::new(layers, lr);
-        n.train(&training_data, &training_labels, 5);
+        n.train(&training_data, &training_labels, 5, false);
         n
     };
 
@@ -88,9 +100,9 @@ fn xor_demo(activation: Activation) {
         Matrix::from(vec![0.0], 1, 1),
     ];
 
-    let layers = vec![Layer::new(2, 3, activation), Layer::new(3, 1, activation)];
+    let layers = vec![Layer::new(2, 3, activation), Layer::new(3, 1, Activation::Sigmoid)];
 
-    let mut network = Network::new(layers, 0.5);
+    let mut network = Network::new(layers, 0.2);
 
     println!("Antes de Entrenar: ");
     for i in 0..inputs.len() {
@@ -103,7 +115,7 @@ fn xor_demo(activation: Activation) {
     }
 
     println!("\nEntrenando...");
-    network.train(&inputs, &targets, 2000);
+    network.train(&inputs, &targets, 2000, true);
 
     println!("\nDespués de Entrenar: ");
     for i in 0..inputs.len() {
