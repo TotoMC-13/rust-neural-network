@@ -194,7 +194,7 @@ impl Matrix {
 
     pub fn random_with_seed(rows: usize, cols: usize, mut seed: u64) -> Matrix {
         let mut res = vec![0.0; rows * cols];
-        let scale = 0.01;
+        let scale = (2.0 / rows as f32).sqrt(); // He initialization Formula
 
         for i in 0..res.len() {
             seed ^= seed << 13;

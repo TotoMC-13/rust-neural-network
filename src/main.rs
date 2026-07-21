@@ -13,16 +13,19 @@ fn main() {
     } else {
         pedir_entrada("Seleccione Demo (0: XOR, 1: MNIST Train, 2: MNIST Load): ")
     };
+    let (activation, lr) = if demo < 2 {
+        let act_choice = if args.len() > 2 {
+            args[2].parse().unwrap_or(0)
+        } else {
+            pedir_entrada("Seleccione Activación (0: Sigmoid, 1: Relu): ")
+        };
 
-    let act_choice = if args.len() > 2 {
-        args[2].parse().unwrap_or(0)
+        match act_choice {
+            1 => (Activation::Relu, 0.01),
+            _ => (Activation::Sigmoid, 0.5),
+        }
     } else {
-        pedir_entrada("Seleccione Activación (0: Sigmoid, 1: Relu): ")
-    };
-
-    let (activation, lr) = match act_choice {
-        1 => (Activation::Relu, 0.01),
-        _ => (Activation::Sigmoid, 0.5),
+        (Activation::Sigmoid, 0.0)
     };
 
     match demo {
@@ -51,7 +54,8 @@ fn images_demo(load: bool, activation: Activation, lr: f32) {
         neural_net::io::load_network("images_model.nn").expect("Error al cargar")
     } else {
         let layers = vec![
-            Layer::new(784, 64, activation),
+            Layer::new(784, 256, activation),
+            Layer::new(256, 64, activation),
             Layer::new(64, 10, Activation::Sigmoid),
         ];
         let mut n = Network::new(layers, lr);
