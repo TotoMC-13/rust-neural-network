@@ -80,7 +80,7 @@ fn images_demo(load: bool, activation: Activation, lr: f32) {
     );
 
     if !load {
-        neural_net::io::save_network(&net, "images_model.nn").expect("Error al guardar");
+        neural_net::io::save_network(&net, "images_model.nn", activation).expect("Error al guardar");
     }
 }
 

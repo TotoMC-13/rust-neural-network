@@ -12,6 +12,7 @@ type DynResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
     Utiliza Little Endian (LE).
 
     Byte 0             : Cantidad de capas (u8) - 1 byte
+    Byte 1             : Tipo de funcion de activacion (0: Sigmoid, 1: Relu) (u8) - 1 byte
 
     REPETIR POR CADA CAPA:
     ---------------------------------------------------------------
@@ -29,11 +30,17 @@ type DynResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
     ---------------------------------------------------------------
 */
 
-pub fn save_network(net: &Network, filename: &str) -> DynResult<()> {
+pub fn save_network(net: &Network, filename: &str, activation: Activation) -> DynResult<()> {
     let mut file = File::create(filename)?;
 
     let layer_count: u8 = net.layers().len() as u8;
+    let activation_type: u8 = match activation {
+        Activation::Sigmoid => 0,
+        Activation::Relu => 1,
+    };
+    
     file.write_all(&layer_count.to_le_bytes())?;
+    file.write_all(&activation_type.to_le_bytes())?;
 
     for layer in net.layers() {
         // Guardamos los pesos
@@ -61,17 +68,42 @@ pub fn save_network(net: &Network, filename: &str) -> DynResult<()> {
 pub fn load_network(filename: &str) -> DynResult<Network> {
     let data = fs::read(filename)?;
     let mut rest = &data[..];
+
     let layer_count = rest[0];
-    rest = &rest[1..];
+    let activation: u8 = rest[1];
+    let act_name: &str = match activation {
+        0 => "Sigmoid",
+        1 => "Relu",
+        _ => return Err("Tipo de activación inválido".into()),
+    };
+
+    println!("Cargando red con {} capas y activación {}", layer_count, act_name);
+
+    rest = &rest[2..];
 
     let mut layers = Vec::with_capacity(layer_count as usize);
-    for _ in 0..layer_count {
+
+    for i in 0..layer_count {
         let (w, next) = load_matrix_from_slice(rest)?;
         rest = next;
         let (b, next) = load_matrix_from_slice(rest)?;
         rest = next;
-        layers.push(Layer::from(w, b, Activation::Sigmoid));
+        
+        
+        let act = if i == layer_count - 1 {
+        Activation::Sigmoid
+        } else {
+            match activation {
+                0 => Activation::Sigmoid,
+                1 => Activation::Relu,
+                _ => return Err("ERROR: Funcion de activacion invalida".into()),
+            }
+        };
+
+        layers.push(Layer::from(w, b, act));
     }
+
+
     Ok(Network::from(layers))
 }
 
