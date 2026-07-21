@@ -3,11 +3,10 @@ use neural_net::matrix::Matrix;
 use neural_net::mnist::{load_data, load_labels};
 use neural_net::network::Network;
 use std::io::{self, Write};
-use std::env; // <-- Agregá esto para leer los argumentos
+use std::env;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    eprintln!("args recibidos: {:?}", args);
 
     let demo = if args.len() > 1 {
         args[1].parse().unwrap_or(0)
