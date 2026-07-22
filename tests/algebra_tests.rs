@@ -1,11 +1,10 @@
 use neural_net::matrix::Matrix;
 
-
 #[test]
 fn test_matrix_creation_and_get() {
     let items = vec![1.0, 2.0, 3.0, 4.0];
     let m = Matrix::from(items, 2, 2);
-    
+
     assert_eq!(m.rows, 2);
     assert_eq!(m.cols, 2);
     assert_eq!(m.get(0, 0), 1.0);
@@ -47,7 +46,7 @@ fn test_sum() {
     let m1 = Matrix::from(vec![1.0, 2.0, 3.0, 4.0], 2, 2);
     let m2 = Matrix::from(vec![4.0, 3.0, 2.0, 1.0], 2, 2);
     let sum = m1.sum(&m2);
-    
+
     assert_eq!(sum.get(0, 0), 5.0);
     assert_eq!(sum.get(0, 1), 5.0);
     assert_eq!(sum.get(1, 0), 5.0);
@@ -59,7 +58,7 @@ fn test_sum_with_negatives() {
     let m1 = Matrix::from(vec![1.0, -2.0, 3.0, -4.0], 2, 2);
     let m2 = Matrix::from(vec![-1.0, 2.0, -3.0, 4.0], 2, 2);
     let sum = m1.sum(&m2);
-    
+
     assert_eq!(sum.get(0, 0), 0.0);
     assert_eq!(sum.get(0, 1), 0.0);
     assert_eq!(sum.get(1, 0), 0.0);
@@ -129,7 +128,7 @@ fn test_transpose_row_to_column() {
 fn test_map_with_addition() {
     let m = Matrix::from(vec![1.0, 2.0, 3.0, 4.0], 2, 2);
     let mapped = m.map(|x| x + 10.0);
-    
+
     assert_eq!(mapped.get(0, 0), 11.0);
     assert_eq!(mapped.get(0, 1), 12.0);
     assert_eq!(mapped.get(1, 0), 13.0);
@@ -140,7 +139,7 @@ fn test_map_with_addition() {
 fn test_map_square() {
     let m = Matrix::from(vec![2.0, 3.0, 4.0, 5.0], 2, 2);
     let mapped = m.map(|x| x * x);
-    
+
     assert_eq!(mapped.get(0, 0), 4.0);
     assert_eq!(mapped.get(0, 1), 9.0);
     assert_eq!(mapped.get(1, 0), 16.0);
@@ -172,7 +171,7 @@ fn test_sub() {
     let m1 = Matrix::from(vec![5.0, 6.0, 7.0, 8.0], 2, 2);
     let m2 = Matrix::from(vec![1.0, 2.0, 3.0, 4.0], 2, 2);
     let sub = m1.sub(&m2);
-    
+
     assert_eq!(sub.get(0, 0), 4.0);
     assert_eq!(sub.get(0, 1), 4.0);
     assert_eq!(sub.get(1, 0), 4.0);
@@ -191,7 +190,7 @@ fn test_sub_invalid_dimensions() {
 fn test_scalar_mul() {
     let m = Matrix::from(vec![1.0, 2.0, 3.0, 4.0], 2, 2);
     let res = m.scalar_mul(2.0);
-    
+
     assert_eq!(res.get(0, 0), 2.0);
     assert_eq!(res.get(0, 1), 4.0);
     assert_eq!(res.get(1, 0), 6.0);
@@ -211,7 +210,7 @@ fn test_random_range() {
     for i in 0..m.rows {
         for j in 0..m.cols {
             let val = m.get(i, j);
-            assert!(val >= -1.0 && val <= 1.0);
+            assert!((-1.0..=1.0).contains(&val));
         }
     }
 }
@@ -220,7 +219,7 @@ fn test_random_range() {
 fn test_random_with_seed() {
     let m1 = Matrix::random_with_seed(5, 5, 42);
     let m2 = Matrix::random_with_seed(5, 5, 42);
-    
+
     for i in 0..5 {
         for j in 0..5 {
             assert_eq!(m1.get(i, j), m2.get(i, j));

@@ -12,6 +12,10 @@ impl Network {
         &self.layers
     }
 
+    pub fn learning_rate(&self) -> f32 {
+        self.learning_rate
+    }
+
     pub fn new(layers: Vec<Layer>, learning_rate: f32) -> Network {
         Network {
             layers,
@@ -32,9 +36,9 @@ impl Network {
         let mut res: Vec<Matrix> = Vec::with_capacity(self.layers.len() + 1);
         let layers = &self.layers;
 
-        for i in 0..layers.len() {
+        for layer in layers {
             res.push(inputs);
-            inputs = layers[i].feed_forward(&res.last().unwrap());
+            inputs = layer.feed_forward(res.last().unwrap());
         }
 
         // Agrego ultimo elemento (resultado)
@@ -84,11 +88,17 @@ impl Network {
         epoch: epoca, cuantas "vueltas" le vamos a dar al set de datos
         learning_rate: step size de n (para el gradient descent, es decir, el "tamaño del paso")
     */
-    pub fn train(&mut self, inputs: &Vec<Matrix>, targets: &Vec<Matrix>, epochs: usize, silence_training: bool) {
+    pub fn train(
+        &mut self,
+        inputs: &[Matrix],
+        targets: &[Matrix],
+        epochs: usize,
+        silence_training: bool,
+    ) {
         let total_start = Instant::now();
 
         println!(
-            "Iniciando entrenamiento con {} datos por {} epochs...",
+            "Starting training with {} samples for {} epochs...",
             inputs.len(),
             epochs
         );
@@ -96,7 +106,7 @@ impl Network {
         for epoch in 0..epochs {
             let epoch_start = Instant::now();
 
-            if !silence_training  {
+            if !silence_training {
                 println!("--- Epoch {}/{} ---", epoch, epochs);
             }
 
@@ -107,7 +117,7 @@ impl Network {
                 if (i + 1) % 10_000 == 0 {
                     let tiempo_parcial = epoch_start.elapsed();
                     println!(
-                        "   -> Procesadas {}/{} imagenes ({:.2?})",
+                        "   -> Processed {}/{} images ({:.2?})",
                         i + 1,
                         inputs.len(),
                         tiempo_parcial
@@ -115,17 +125,14 @@ impl Network {
                 }
             }
 
-            if !silence_training  {
+            if !silence_training {
                 println!(
-                    "> Epoch {} finalizada en {:.2?}",
+                    "> Epoch {} finished in {:.2?}",
                     epoch,
                     epoch_start.elapsed()
                 );
             }
         }
-        println!(
-            "Entrenamiento total finalizado en {:.2?}",
-            total_start.elapsed()
-        );
+        println!("Total training finished in {:.2?}", total_start.elapsed());
     }
 }

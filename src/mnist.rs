@@ -1,7 +1,7 @@
-use std::fs;
 use crate::matrix::Matrix;
+use std::fs;
 
-/*  
+/*
     Bytes
     0..4 : Magic Number
     4..8: Cantidad de Imagenes
@@ -17,16 +17,16 @@ pub fn load_data(filename: &str) -> Result<Vec<Matrix>, Box<dyn std::error::Erro
     let num_images = u32::from_be_bytes(data[4..8].try_into()?);
 
     // Cargar imagenes
-    
+
     let images_data = &data[16..];
 
     let chunk_size = 784; // Size de cada imagen en bytes
 
-    let mut chunks = images_data.chunks_exact(chunk_size);
+    let chunks = images_data.chunks_exact(chunk_size);
 
     let mut images: Vec<Matrix> = Vec::with_capacity(num_images as usize);
 
-    while let Some(chunk) = chunks.next() {
+    for chunk in chunks {
         let mut pixel_data: Vec<f32> = Vec::with_capacity(chunk_size);
 
         for &pixel in chunk {
@@ -45,7 +45,7 @@ pub fn load_data(filename: &str) -> Result<Vec<Matrix>, Box<dyn std::error::Erro
     Bytes
     0..4: Magic number
     4..8: Cantidad de Items
-    8.. : Labels 
+    8.. : Labels
 */
 
 pub fn load_labels(filename: &str) -> Result<Vec<Matrix>, Box<dyn std::error::Error + 'static>> {
