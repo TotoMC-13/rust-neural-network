@@ -54,7 +54,7 @@ fn new_rayon_mul(m1: &Matrix, m2: &Matrix) -> Vec<f32> {
 }
 
 fn bench_matrix_multiplication(c: &mut Criterion) {
-    let sizes = [128, 512, 1024];
+    let sizes = [128, 256, 512];
 
     for size in sizes.iter() {
         let mut group = c.benchmark_group(format!("Matrix_Mul_{}", size));
@@ -86,7 +86,7 @@ fn bench_matrix_multiplication(c: &mut Criterion) {
 }
 
 fn custom_criterion() -> Criterion {
-    Criterion::default().measurement_time(Duration::from_secs(20))
+    Criterion::default().measurement_time(Duration::from_secs(10))
 }
 
 criterion_group! {

@@ -13,7 +13,7 @@ fn main() {
     } else {
         pedir_entrada("Select Demo (0: XOR, 1: MNIST Train, 2: MNIST Load): ")
     };
-    let (activation, lr) = if demo < 2 {
+    let (activation, lr) = if demo == 1 {
         let act_choice = if args.len() > 2 {
             args[2].parse().unwrap_or(0)
         } else {
@@ -21,8 +21,8 @@ fn main() {
         };
 
         match act_choice {
-            1 => (Activation::Relu, 0.01),
-            _ => (Activation::Sigmoid, 0.5),
+            1 => (Activation::Relu, 0.1),
+            _ => (Activation::Sigmoid, 5.0),
         }
     } else {
         (Activation::Sigmoid, 0.0)
@@ -51,7 +51,7 @@ fn images_demo(load: bool, activation: Activation, lr: f32) {
     let testing_labels = load_labels("data/testing-labels.idx1-ubyte").unwrap();
 
     let mut train_duration = 0.0;
-    let epochs = 5;
+    let epochs = 20;
     let net = if load {
         neural_net::io::load_network("images_model.nn").expect("Error loading network")
     } else {
@@ -62,7 +62,7 @@ fn images_demo(load: bool, activation: Activation, lr: f32) {
         ];
         let mut n = Network::new(layers, lr);
         let train_start = std::time::Instant::now();
-        n.train(&training_data, &training_labels, epochs, false);
+        n.train(&training_data, &training_labels, epochs, false, 32);
         train_duration = train_start.elapsed().as_secs_f32();
         n
     };
@@ -72,7 +72,7 @@ fn images_demo(load: bool, activation: Activation, lr: f32) {
     let total = testing_data.len();
 
     for (input, target) in testing_data.iter().zip(testing_labels.iter()) {
-        let outputs = net.feed_forward(input.clone());
+        let outputs = net.feed_forward(input);
         let prediction = outputs.last().unwrap();
 
         if prediction.argmax() == target.argmax() {
@@ -122,7 +122,7 @@ fn xor_demo(activation: Activation) {
 
     println!("Before Training: ");
     for input in &inputs {
-        let output = network.feed_forward(input.clone());
+        let output = network.feed_forward(input);
         println!(
             "Input: {} -> Output: {:.3}",
             input,
@@ -133,13 +133,13 @@ fn xor_demo(activation: Activation) {
     println!("\nTraining...");
     let epochs = 2000;
     let train_start = std::time::Instant::now();
-    network.train(&inputs, &targets, epochs, true);
+    network.train(&inputs, &targets, epochs, true, 1);
     let train_duration = train_start.elapsed().as_secs_f32();
 
     println!("\nAfter Training: ");
     let mut aciertos = 0;
     for i in 0..inputs.len() {
-        let output = network.feed_forward(inputs[i].clone());
+        let output = network.feed_forward(&inputs[i]);
         let pred = output.last().unwrap().get(0, 0);
         let target = targets[i].get(0, 0);
         if (pred >= 0.5 && target >= 0.5) || (pred < 0.5 && target < 0.5) {
