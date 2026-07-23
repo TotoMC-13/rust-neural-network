@@ -52,7 +52,7 @@ impl Layer {
 
     pub fn feed_forward(&self, inputs: &Matrix) -> Matrix {
         (inputs.mul(&self.weights))
-            .sum(&self.biases)
+            .sum_broadcast(&self.biases)
             .map(self.activation)
     }
 }

@@ -7,6 +7,19 @@ pub struct Network {
     learning_rate: f32,
 }
 
+fn create_batches(data: &[Matrix], batch_size: usize) -> Vec<Matrix> {
+    let cols = data[0].cols();
+    data.chunks(batch_size)
+        .map(|chunk| {
+            let mut items: Vec<f32> = Vec::with_capacity(chunk.len() * cols);
+            for matrix in chunk {
+                items.extend_from_slice(matrix.items());
+            }
+            Matrix::from(items, chunk.len(), cols)
+        })
+        .collect()
+}
+
 impl Network {
     pub fn layers(&self) -> &[Layer] {
         &self.layers
@@ -32,17 +45,13 @@ impl Network {
 
     // Devuelve los input procesados, desde el primero al ultimo
     // Input es el que entra a la primer layer (por eso es, la entrada)
-    pub fn feed_forward(&self, mut inputs: Matrix) -> Vec<Matrix> {
-        let mut res: Vec<Matrix> = Vec::with_capacity(self.layers.len() + 1);
-        let layers = &self.layers;
+    pub fn feed_forward(&self, inputs: &Matrix) -> Vec<Matrix> {
+        let mut res: Vec<Matrix> = Vec::with_capacity(self.layers.len());
 
-        for layer in layers {
-            res.push(inputs);
-            inputs = layer.feed_forward(res.last().unwrap());
+        for (i, layer) in self.layers.iter().enumerate() {
+            let layer_input = if i == 0 { inputs } else { res.last().unwrap() };
+            res.push(layer.feed_forward(layer_input));
         }
-
-        // Agrego ultimo elemento (resultado)
-        res.push(inputs);
 
         res
     }
@@ -54,30 +63,28 @@ impl Network {
         despues cambio el error viejo para que lo use el que sigue.
     */
 
-    pub fn back_propagate(&mut self, outputs: Vec<Matrix>, targets: Matrix) {
+    pub fn back_propagate(
+        &mut self,
+        outputs: &[Matrix],
+        targets: &Matrix,
+        inputs: &Matrix,
+        batch_size: usize,
+    ) {
+        let lr = self.learning_rate / batch_size as f32;
         let mut error = targets.sub(outputs.last().unwrap());
-
         for (i, layer) in self.layers.iter_mut().enumerate().rev() {
-            // Calculamos el gradiente (sin learning rate todavia)
-            let gradients = outputs[i + 1].map(layer.derivative).dot_mul(&error);
+            let gradients = outputs[i].map_and_dot_mul(layer.derivative, &error);
 
-            // Calculamos los deltas de pesos (Aca si aplicamos LR)
-            let delta_weights = outputs[i]
-                .transpose()
-                .mul(&gradients)
-                .scalar_mul(self.learning_rate);
+            let layer_input = if i == 0 { inputs } else { &outputs[i - 1] };
 
-            // También necesitamos delta para bias (Gradients * LR)
-            let delta_biases = gradients.scalar_mul(self.learning_rate);
+            let delta_weights = layer_input.mul_transpose_left(&gradients, lr);
 
-            // Calculamos el error para la siguiente vuelta (Usando gradiente)
-            let next_error = gradients.mul(&layer.weights.transpose());
+            let delta_biases = gradients.sum_rows().scalar_mul(lr);
 
-            // Actualizamos la capa
-            layer.weights = layer.weights.sum(&delta_weights);
-            layer.biases = layer.biases.sum(&delta_biases);
+            let next_error = gradients.mul_transpose_right(&layer.weights);
 
-            // Pasamos al siguiente
+            layer.weights.add_mut(&delta_weights);
+            layer.biases.add_mut(&delta_biases);
             error = next_error;
         }
     }
@@ -94,8 +101,11 @@ impl Network {
         targets: &[Matrix],
         epochs: usize,
         silence_training: bool,
+        batch_size: usize,
     ) {
         let total_start = Instant::now();
+        let batched_inputs = create_batches(inputs, batch_size);
+        let batched_targets = create_batches(targets, batch_size);
 
         println!(
             "Starting training with {} samples for {} epochs...",
@@ -110,16 +120,19 @@ impl Network {
                 println!("--- Epoch {}/{} ---", epoch, epochs);
             }
 
-            for (i, input) in inputs.iter().cloned().enumerate() {
-                let outputs = self.feed_forward(input);
-                self.back_propagate(outputs, targets[i].clone());
-
-                if (i + 1) % 10_000 == 0 {
+            for (i, (batch_input, batch_target)) in batched_inputs
+                .iter()
+                .zip(batched_targets.iter())
+                .enumerate()
+            {
+                let outputs = self.feed_forward(batch_input);
+                self.back_propagate(&outputs, batch_target, batch_input, batch_size);
+                if (i + 1) % 500 == 0 {
                     let tiempo_parcial = epoch_start.elapsed();
                     println!(
-                        "   -> Processed {}/{} images ({:.2?})",
+                        "   -> Batch {}/{} ({:.2?})",
                         i + 1,
-                        inputs.len(),
+                        batched_inputs.len(),
                         tiempo_parcial
                     );
                 }
